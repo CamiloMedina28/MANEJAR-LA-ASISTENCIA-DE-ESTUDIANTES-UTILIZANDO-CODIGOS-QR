@@ -1,4 +1,4 @@
-import sys 
+import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5 import QtGui
 import shutil as copy_files
@@ -8,7 +8,9 @@ from PyQt5.uic import loadUi
 import database as db
 import qr
 import re
-print('\033[2J') # Borrar la terminal / secuencia de escape
+import os
+
+print('\033[2J')  # Borrar la terminal / secuencia de escape
 
 
 class VentanaPrincipal(QMainWindow):
@@ -17,8 +19,13 @@ class VentanaPrincipal(QMainWindow):
         try:
             loadUi('./PYQT5_interfaz_grafica_moderna/diseño.ui', self)
         except FileNotFoundError:
-            print('\033[38;5;196m'+' El archivo de la interfaz gráfica NO existe')
+            print('\033[38;5;196m' + ' El archivo de la interfaz gráfica NO existe')
             quit()
+        else:
+            if os.path.isdir('./codigos_qr'):
+                pass
+            else:
+                os.mkdir('./codigos_qr')
         messagebox.showinfo('Conexión', db.conexion_base_de_datos())
         self.setWindowTitle('Manejo de asistencia')
         self.setWindowIcon(QtGui.QIcon('./icos/icono principal.png'))
@@ -44,11 +51,12 @@ class VentanaPrincipal(QMainWindow):
         self.boton_verqr.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.VER_QR))
         self.boton_asistencia.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.ASISTENCIA))
         self.boton_informacion.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.INFORMACION))
-        self.ver_asistencia_id.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.VER_ASISTENCIA_USANDO_ID))
-        self.ver_asistencia_qr.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.ver_asistencia_usando_qr))
+        self.ver_asistencia_id.clicked.connect(
+            lambda: self.stackedWidget.setCurrentWidget(self.VER_ASISTENCIA_USANDO_ID))
+        self.ver_asistencia_qr.clicked.connect(
+            lambda: self.stackedWidget.setCurrentWidget(self.ver_asistencia_usando_qr))
         self.alterar_lista.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.Alterar_asistencia))
 
-        
     def agregar_registros(self):
         """Agregar registros a la base de datos de los estudiantes
 
@@ -65,20 +73,20 @@ class VentanaPrincipal(QMainWindow):
             self.identrada.clear()
             self.nombreentrada.clear()
             self.cursoentrada.clear()
-            messagebox.showerror('ERROR','Los datos ingresados son inconsistentes, verifique e intente de nuevo')
+            messagebox.showerror('ERROR', 'Los datos ingresados son inconsistentes, verifique e intente de nuevo')
         else:
             if id != '' and nombre != '' and curso != '' and db.consultar(id) == None:
                 if db.crear_registro(id, nombre, curso) == 1 or qr.crearqr((id, nombre, curso), self.directorio) == 1:
-                    messagebox.showerror('ERROR', 'Error al conectar con la base de datos, los registros no fueron guardados')
-                else: 
+                    messagebox.showerror('ERROR',
+                                         'Error al conectar con la base de datos, los registros no fueron guardados')
+                else:
                     self.identrada.clear()
                     self.nombreentrada.clear()
                     self.cursoentrada.clear()
                     messagebox.showinfo('Proceso logrado', 'Los registros fueron guardados en la base de datos')
             else:
-                messagebox.showerror('ERROR','Los datos ingresados son inconsistentes, verifique e intente de nuevo')
+                messagebox.showerror('ERROR', 'Los datos ingresados son inconsistentes, verifique e intente de nuevo')
 
-    
     def eliminar_registros(self):
         """Eliminar registros de la base de datos de los estudiantes
 
@@ -94,13 +102,13 @@ class VentanaPrincipal(QMainWindow):
         else:
             if id != '':
                 if db.borrar_registro(id, self.directorio) == 1:
-                    messagebox.showerror('ERROR', 'Error al conectar con la base de datos, los registros no fueron guardados')
+                    messagebox.showerror('ERROR',
+                                         'Error al conectar con la base de datos, los registros no fueron guardados')
                 else:
                     messagebox.showinfo('Proceso logrado', 'Los registros fueron eliminados de la base de datos')
                     self.ingresar_id_eliminar.clear()
-            else: 
+            else:
                 messagebox.showerror('ERROR', 'Verifique el id ingresado, el registro no pudo ser eliminado.')
-
 
     def editar_registros(self):
         """Editar registros de la base de datos.
@@ -117,7 +125,8 @@ class VentanaPrincipal(QMainWindow):
         else:
             if id != '' and nombre != '' and curso != '':
                 if db.actualizar(id, nombre, curso) == 1:
-                    messagebox.showerror('ERROR', 'Error al conectar con la base de datos, los registros no fueron guardados')
+                    messagebox.showerror('ERROR',
+                                         'Error al conectar con la base de datos, los registros no fueron guardados')
                 else:
                     self.entrada_id.clear()
                     self.entrada_nombre.clear()
@@ -125,7 +134,6 @@ class VentanaPrincipal(QMainWindow):
                     messagebox.showinfo('Proceso logrado', 'Los datos fueron actualizados con exito')
             else:
                 messagebox.showerror('ERROR', 'Verifique los datos ingresados, el registro no pudo ser actualizado.')
-
 
     def consultar_registros(self):
         """Consultar registros de la base de datos.
@@ -147,12 +155,12 @@ class VentanaPrincipal(QMainWindow):
                     try:
                         self.ingresar_id_consultar.clear()
                         messagebox.showinfo('Datos', f'id: {datos[0]}, nombre: {datos[1]}, curso: {datos[2]}')
-                    except: messagebox.showinfo('Error', 'verifique los datos ingresados, el registro no se pudo consultar')
+                    except:
+                        messagebox.showinfo('Error', 'verifique los datos ingresados, el registro no se pudo consultar')
             else:
                 messagebox.showinfo('ERROR', 'El id de usuario ingresado no es válido, verifiquelo e intente de nuevo')
 
-
-    def ver_codigo_qr (self):
+    def ver_codigo_qr(self):
         """Función para generar el codigo qr de estudiante
 
         Se busca el código qr de la persona a través del id, si este es encontrado se muestra como fondo a
@@ -174,7 +182,6 @@ class VentanaPrincipal(QMainWindow):
             else:
                 imagen = QPixmap(ruta_del_archivo)
                 self.label_mostrar_qr.setPixmap(imagen)
-            
 
     def info_qr(self):
         """Visualizar la información de los códigos qr
@@ -186,7 +193,6 @@ class VentanaPrincipal(QMainWindow):
             messagebox.showinfo('info', f'id: {informacion[0]} \n nombre: {informacion[1]} \n curso:{informacion[2]}')
         except TypeError:
             messagebox.showerror('Error', 'El estudiante no se encuentra en la base de datos')
-
 
     def llamar_a_asistencia(self):
         """Llamado de asistencia 
@@ -204,20 +210,18 @@ class VentanaPrincipal(QMainWindow):
                 messagebox.showerror('Error', f'El estudiante {valor[0]} no se encuentra en la base de datos')
             else:
                 db.llamar_asistencia(informacion[0])
-    
 
     def asistencia_id(self):
         id_consultar = self.ingresar_id_asistencia.text().upper()
         respuestas = db.ver_asistencia(id_consultar)
-        if respuestas == 1 :
+        if respuestas == 1:
             messagebox.showerror('ERROR', 'Por favor verifique los datos ingresados')
         else:
             string_general = ''
             for i in respuestas:
-                string_general += i 
+                string_general += i
                 string_general += '\n'
             self.label_informacion.setText(string_general)
-    
 
     def asistencia_qr(self):
         lectura = str(qr.lectura_qr())
@@ -227,16 +231,15 @@ class VentanaPrincipal(QMainWindow):
             respuestas = db.ver_asistencia(lectura[0])
         except TypeError:
             messagebox.showerror('Error', 'El estudiante no se encuentra en la base de datos')
-        else: 
+        else:
             if respuestas == 1:
                 messagebox.showerror('ERROR', 'Ha ocurrido un error al recopilar los datos')
             else:
                 string_general = ''
                 for i in respuestas:
-                    string_general += i 
+                    string_general += i
                     string_general += '\n'
                 self.label_info_qr.setText(string_general)
-
 
     def guardar_imagen_codigo_qr(self):
         try:
@@ -245,7 +248,7 @@ class VentanaPrincipal(QMainWindow):
             if db.consultar(id) == 1:
                 messagebox.showerror('Error', 'El id no se encontró en la base de datos.')
                 self.Ingresar_id_ver_qr.clear()
-        except: 
+        except:
             messagebox.showerror('Error', 'Ha ocurrido un error, verifique la información proporcionada.')
         else:
             try:
@@ -255,33 +258,31 @@ class VentanaPrincipal(QMainWindow):
                 self.Ingresar_id_ver_qr.clear()
             else:
                 messagebox.showinfo('Proceso Exitoso', 'El código ha sido guardado con exito')
-    
 
     def cambiar_valores_combobox_asistencia(self):
         try:
             id = int(self.id_consulta_asistencia.text().upper())
             if db.consultar(id) == None: raise ValueError
-        except ValueError: messagebox.showerror('Error', 'El ID ingresado no es válido')
+        except ValueError:
+            messagebox.showerror('Error', 'El ID ingresado no es válido')
         else:
             fechas = db.ver_fechas()
             for i in range(len(fechas)):
                 self.comboBox_fechas.addItem(fechas[i])
-    
 
     def combochanged(self):
         id = int(self.id_consulta_asistencia.text().upper())
         valor_combobox = self.comboBox_fechas.currentText()
         asistencia = db.ver_asistencia(id)
         for i in asistencia:
-            value = re.search(valor_combobox,i)
-            if value != None: 
+            value = re.search(valor_combobox, i)
+            if value != None:
                 String = i
                 break
         self.label_info_asistencia_cambiar.setText(String)
 
-
     def cambiar_asistencia(self):
-        try: 
+        try:
             id = int(self.id_consulta_asistencia.text().upper())
             valor_combobox = self.comboBox_fechas.currentText()
             db.alterar_asistencia_segun_fecha(id, valor_combobox)
@@ -293,11 +294,10 @@ class VentanaPrincipal(QMainWindow):
             self.id_consulta_asistencia.clear()
             self.comboBox_fechas.clear()
             self.label_info_asistencia_cambiar.clear()
-        
-    
+
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     mi_app = VentanaPrincipal()
     mi_app.show()
     sys.exit(app.exec_())
-    

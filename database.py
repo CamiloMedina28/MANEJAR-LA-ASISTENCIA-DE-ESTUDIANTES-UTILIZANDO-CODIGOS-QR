@@ -1,12 +1,16 @@
 import sqlite3
 from os import remove
+import os
 from datetime import datetime
-from typing import LiteralString
-
+ruta = './base de datos/base_de_datos.db'
+if os.path.isdir('./base de datos'):
+    pass
+else:
+    os.mkdir('./base de datos')
 
 def ver_fechas():
     try:
-        conexion = sqlite3.connect('./base de datos/base_de_datos.db')
+        conexion = sqlite3.connect(ruta)
         cursor = conexion.cursor()
     except: return 1
     else:
@@ -21,7 +25,7 @@ def conexion_base_de_datos() -> str:
     Returns:
         string: Si la conexión fue exitosa se indicqa al usuario que el proceso se logró.
     """
-    conexion = sqlite3.connect("./base de datos/base_de_datos.db")
+    conexion = sqlite3.connect(ruta)
     cursor = conexion.cursor()
 
     try:
@@ -44,7 +48,7 @@ def borrar_registro(id:int, directorio:str) -> int:
         remove(f'{directorio}/{id}.png')
     except: return 1
     try:
-        conexion = sqlite3.connect("./base de datos/base_de_datos.db")
+        conexion = sqlite3.connect(ruta)
         cursor = conexion.cursor()
     except: return 1
     else:
@@ -67,7 +71,7 @@ def crear_registro(id:int, nombre:str, curso:int) -> int:
         int: 0 proceso logrado, 1 proceso fallido
     """
     try:
-        conexion = sqlite3.connect("./base de datos/base_de_datos.db")
+        conexion = sqlite3.connect(ruta)
         cursor = conexion.cursor()
     except: return 1
     else:
@@ -91,7 +95,7 @@ def actualizar(id:int, nombre:str, curso:int) -> int:
         int: 1 proceso fallido, 0 proceso logrado
     """
     try:
-        conexion = sqlite3.connect("./base de datos/base_de_datos.db")
+        conexion = sqlite3.connect(ruta)
         cursor = conexion.cursor()
     except: return 1
     else:
@@ -113,7 +117,7 @@ def consultar(id: int) -> int:
         int: 1 proceso fallido, 0 proceso logrado
     """
     try:
-        conexion = sqlite3.connect("./base de datos/base_de_datos.db")
+        conexion = sqlite3.connect(ruta)
         cursor = conexion.cursor()
     except: return 1
     else:
@@ -133,7 +137,7 @@ def llamar_asistencia(id:int):
         int: 1 proceso fallido, 0 proceso logrado
     """
     try: 
-        conexion = sqlite3.connect('./base de datos/base_de_datos.db')
+        conexion = sqlite3.connect(ruta)
         cursor = conexion.cursor()
     except: return 1
     else:
@@ -162,7 +166,7 @@ def ver_asistencia(id:int):
         int: 1 proceso fallido, 0 proceso logrado
     """
     try: 
-        conexion = sqlite3.connect('./base de datos/base_de_datos.db')
+        conexion = sqlite3.connect(ruta)
         cursor = conexion.cursor()
     except: return 1
     else:
@@ -190,7 +194,7 @@ def ver_asistencia(id:int):
 
 def alterar_asistencia_segun_fecha(id:int, fecha:str):
     try: 
-        conexion = sqlite3.connect('./base de datos/base_de_datos.db')
+        conexion = sqlite3.connect(ruta)
         cursor = conexion.cursor()
     except: return 1
     else:
